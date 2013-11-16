@@ -32,7 +32,8 @@
   "engines": {
     "node": ">= 0.8.0"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "mocha": "~1.11.0",
     "grunt": "~0.4.1",
@@ -44,7 +45,8 @@
     "request": "~2.27.0",
     "get-pixels": "~1.0.1",
     "save-pixels": "~0.3.0",
-    "ndarray": "~1.0.8"
+    "ndarray": "~1.0.8",
+    "function-signature": "~0.2.0"
   },
   "keywords": [
     "phantomjs",
