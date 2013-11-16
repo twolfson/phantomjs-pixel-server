@@ -1,3 +1,4 @@
+var assert = require('assert');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
 var getPixels = require('get-pixels');
@@ -57,28 +58,31 @@ describe('phantomjs-pixel-server', function () {
         done(err);
       });
     });
-
-    it('returns an array of pixel values', function (done) {
-      var actualPixels;
+    before(function () {
       try {
-        actualPixels = JSON.parse(this.body);
+        this.actualPixels = JSON.parse(this.body);
       } catch (e) {
         console.log('Body was ', this.body);
         throw e;
       }
+    });
 
-      if (process.env.DEBUG_TEST) {
-        var png = savePixels(ndarray(actualPixels, [10 * 10 * 4], [10], 0), 'png');
+    if (process.env.DEBUG_TEST) {
+      before(function (done) {
+        var png = savePixels(ndarray(this.actualPixels, [10, 10, 4], [4 * 10, 4, 1], 0), 'png');
         try { fs.mkdirSync(__dirname + '/actual-files'); } catch (e) {}
-        fs.writeFileSync(__dirname + '/actual-files/checkerboard.png', png.read());
-      }
+        png.pipe(fs.createWriteStream(__dirname + '/actual-files/checkerboard.png'));
+        png.on('end', done);
+      });
+    }
 
+    it('returns an array of pixel values', function (done) {
+      var that = this;
       getPixels(__dirname + '/expected-files/checkerboard.png', function (err, expectedPixels) {
         if (err) {
           return done(err);
         }
-
-        assert.strictEqual(actualPixels, expectedPixels);
+        assert.deepEqual(that.actualPixels, expectedPixels.data);
       });
     });
   });
