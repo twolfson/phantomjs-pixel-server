@@ -21,16 +21,16 @@
       "url": "https://github.com/twolfson/phantomjs-pixel-server/blob/master/UNLICENSE"
     }
   ],
-  "main": "lib/phantomjs-pixel-server",
-  "engines": {
-    "node": ">= 0.8.0"
-  },
   "bin": {
     "phantomjs-pixel-server": "bin/phantomjs-pixel-server"
   },
+  "main": "lib/phantomjs-pixel-server",
   "scripts": {
     "build-commander": "mkdir -p lib/vendor && browserify --standalone commander --entry node_modules/commander/index.js --transform phantomjsify --external system --outfile lib/vendor/commander.js",
     "test": "mocha"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
   },
   "dependencies": {},
   "devDependencies": {
@@ -39,7 +39,8 @@
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-watch": "~0.4.0",
     "browserify": "~2.35.2",
-    "commander": "~2.0.0"
+    "commander": "~2.0.0",
+    "phantomjsify": "~0.1.0"
   },
   "keywords": [
     "phantomjs",
