@@ -6,6 +6,60 @@ var ndarray = require('ndarray');
 var request = require('request');
 var savePixels = require('save-pixels');
 
+function makeRequest(params) {
+  before(function (done) {
+    // Stringify our argument for phantomjs
+    var arg = JSON.stringify(params);
+    var encodedArg = encodeURIComponent(arg);
+
+    // Request to our server
+    var that = this;
+    request({
+      url: 'http://localhost:9090/',
+      method: 'POST',
+      headers: {
+        // DEV: PhantomJS looks for Proper-Case headers, request is lower-case =(
+        // TODO: Note this in the README
+        'Content-Length': encodedArg.length
+      },
+      body: encodedArg,
+    }, function handlePhantomResponse (err, res, body) {
+      that.res = res;
+      that.body = body;
+      done(err);
+    });
+  });
+}
+function parseResponse() {
+  before(function () {
+    try {
+      this.actualPixels = JSON.parse(this.body);
+    } catch (e) {
+      console.log('Body was ', this.body);
+      throw e;
+    }
+  });
+}
+function debugActual(filename) {
+  if (process.env.DEBUG_TEST) {
+    before(function (done) {
+      var png = savePixels(ndarray(this.actualPixels, [10, 10, 4], [4 * 10, 4, 1], 0), 'png');
+      try { fs.mkdirSync(__dirname + '/actual-files'); } catch (e) {}
+      png.pipe(fs.createWriteStream(__dirname + '/actual-files/' + filename));
+      png.on('end', done);
+    });
+  }
+}
+function loadExpected(filename) {
+  before(function (done) {
+    var that = this;
+    getPixels(__dirname + '/expected-files/' + filename, function (err, expectedPixels) {
+      that.expectedPixels = expectedPixels;
+      done(err);
+    });
+  });
+}
+
 describe('phantomjs-pixel-server', function () {
   before(function (done) {
     this.child = spawn('phantomjs', [__dirname + '/../lib/phantomjs-pixel-server.js'], {stdio: [0, 1, 2]});
@@ -22,66 +76,23 @@ describe('phantomjs-pixel-server', function () {
   });
 
   describe('given a set of commands on a canvas', function () {
-    before(function (done) {
-      // Stringify our argument for phantomjs
-      var params = {
-        width: 10,
-        height: 10,
-        // TODO: Move to function over vanilla JS so the callback makes sense
-        js: [
-          // Draw a white on black checkerboard
-          'context.fillStyle = "#000000";',
-          'context.fillRect(0, 0, 10, 10);',
-          'context.fillStyle = "#FFFFFF";',
-          'context.fillRect(0, 0, 5, 5);',
-          'context.fillRect(5, 5, 5, 5);',
-          'cb();'
-        ].join('\n')
-      };
-      var arg = JSON.stringify(params);
-      var encodedArg = encodeURIComponent(arg);
-
-      // Request to our server
-      var that = this;
-      request({
-        url: 'http://localhost:9090/',
-        method: 'POST',
-        headers: {
-          // DEV: PhantomJS looks for Proper-Case headers, request is lower-case =(
-          // TODO: Note this in the README
-          'Content-Length': encodedArg.length
-        },
-        body: encodedArg,
-      }, function handlePhantomResponse (err, res, body) {
-        that.res = res;
-        that.body = body;
-        done(err);
-      });
+    makeRequest({
+      width: 10,
+      height: 10,
+      // TODO: Move to function over vanilla JS so the callback makes sense
+      js: [
+        // Draw a white on black checkerboard
+        'context.fillStyle = "#000000";',
+        'context.fillRect(0, 0, 10, 10);',
+        'context.fillStyle = "#FFFFFF";',
+        'context.fillRect(0, 0, 5, 5);',
+        'context.fillRect(5, 5, 5, 5);',
+        'cb();'
+      ].join('\n')
     });
-    before(function () {
-      try {
-        this.actualPixels = JSON.parse(this.body);
-      } catch (e) {
-        console.log('Body was ', this.body);
-        throw e;
-      }
-    });
-
-    if (process.env.DEBUG_TEST) {
-      before(function (done) {
-        var png = savePixels(ndarray(this.actualPixels, [10, 10, 4], [4 * 10, 4, 1], 0), 'png');
-        try { fs.mkdirSync(__dirname + '/actual-files'); } catch (e) {}
-        png.pipe(fs.createWriteStream(__dirname + '/actual-files/checkerboard.png'));
-        png.on('end', done);
-      });
-    }
-    before(function (done) {
-      var that = this;
-      getPixels(__dirname + '/expected-files/checkerboard.png', function (err, expectedPixels) {
-        that.expectedPixels = expectedPixels;
-        done(err);
-      });
-    });
+    parseResponse();
+    debugActual('checkerboard.png');
+    loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
       assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
