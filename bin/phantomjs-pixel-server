@@ -5,19 +5,17 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 var args = [require.resolve('../')];
 
-console.log(args);
+// Append user arguments
+args.push.apply(args, process.argv.slice(2));
 
-// // Append user arguments
-// args.push.apply(args, process.argv.slice(2));
-
-// // Spawn phantomjs-pixel-server
-// var child = spawn('phantomjs', args, {customFds: [0,1,2]});
-// child.on('exit', function (code, signal) {
-//   process.on('exit', function(){
-//     if (signal) {
-//       process.kill(process.pid, signal);
-//     } else {
-//       process.exit(code);
-//     }
-//   });
-// });
+// Spawn phantomjs-pixel-server
+var child = spawn('phantomjs', args, {customFds: [0,1,2]});
+child.on('exit', function (code, signal) {
+  process.on('exit', function(){
+    if (signal) {
+      process.kill(process.pid, signal);
+    } else {
+      process.exit(code);
+    }
+  });
+});
