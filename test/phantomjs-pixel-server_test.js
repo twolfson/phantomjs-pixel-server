@@ -3,7 +3,7 @@ var request = require('request');
 
 describe('phantomjs-pixel-server', function () {
   before(function (done) {
-    this.child = spawn(__dirname + '/../bin/phantomjs-pixel-server', [], {stdio: [0, 1, 2]});
+    this.child = spawn('phantomjs', [__dirname + '/../lib/phantomjs-pixel-server.js'], {stdio: [0, 1, 2]});
     setTimeout(function () {
       // TODO: We could wait for 200 from server
       done();
