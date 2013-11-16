@@ -34,18 +34,21 @@
 
         // Capture the data url and save it for later
         var data = context.getImageData(0, 0, params.width, params.height).data;
-        window.retStr = JSON.stringify([].slice.call(data));
 
         // DEV: This is the encrypt as a string case
-        // var i = 0;
-        // var len = data.length;
-        // var retArr = new Array(len);
-        // for (; i < len; i++) {
-        //   // TODO: If data size is super important, consider doubling up on digits by offsetting by 256 (this does lead into potential issues with orphan end pair)
-        //   // TODO: Never mind, we can't do anything with this damn offset
-        //   retArr[i] = String.fromCharCode(data[i] + 33);
-        // }
-        // window.retStr = retArr.join('');
+        if (params.responseType === 'string') {
+          var i = 0;
+          var len = data.length;
+          var retArr = new Array(len);
+          for (; i < len; i++) {
+            // TODO: If data size is super important, consider doubling up on digits by offsetting by 256 (this does lead into potential issues with orphan end pair)
+            // TODO: Never mind, we can't do anything with this damn offset
+            retArr[i] = String.fromCharCode(data[i] + 33);
+          }
+          window.retStr = retArr.join('');
+        } else {
+          window.retStr = JSON.stringify([].slice.call(data));
+        }
       });
     </script>
   </body>

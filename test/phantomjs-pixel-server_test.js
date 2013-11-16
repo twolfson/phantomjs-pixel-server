@@ -30,16 +30,6 @@ function makeRequest(params) {
     });
   });
 }
-function parseResponse() {
-  before(function () {
-    try {
-      this.actualPixels = JSON.parse(this.body);
-    } catch (e) {
-      console.log('Body was ', this.body);
-      throw e;
-    }
-  });
-}
 function debugActual(filename) {
   if (process.env.DEBUG_TEST) {
     before(function (done) {
@@ -90,7 +80,14 @@ describe('phantomjs-pixel-server', function () {
         'cb();'
       ].join('\n')
     });
-    parseResponse();
+    before(function () {
+      try {
+        this.actualPixels = JSON.parse(this.body);
+      } catch (e) {
+        console.log('Body was ', this.body);
+        throw e;
+      }
+    });
     debugActual('checkerboard.png');
     loadExpected('checkerboard.png');
 
@@ -99,12 +96,45 @@ describe('phantomjs-pixel-server', function () {
     });
   });
 
-  describe.skip('given commands which encrypt as a string', function () {
+  describe('given commands which encrypt as a string', function () {
     // DEV: These were optimal for gifsockets but proved troublesome on Windows with stdout
     // TODO: Look into if Windows + stdout gives us the same trouble
     // TODO: Will the output have to be offset since we are over HTTP?
-    it('gives an encoded string which corresponds to pixel values', function () {
+        makeRequest({
+      width: 10,
+      height: 10,
+      // TODO: Move to function over vanilla JS so the callback makes sense
+      js: [
+        // Draw a white on black checkerboard
+        'context.fillStyle = "#000000";',
+        'context.fillRect(0, 0, 10, 10);',
+        'context.fillStyle = "#FFFFFF";',
+        'context.fillRect(0, 0, 5, 5);',
+        'context.fillRect(5, 5, 5, 5);',
+        'cb();'
+      ].join('\n'),
+      responseType: 'string'
+    });
+    before(function () {
+      try {
+        var body = this.body;
+        var i = 0;
+        var len = body.length;
+        var pixels = new Array(len);
+        this.actualPixels = pixels;
+        for (; i < len; i++) {
+          pixels[i] = body.charCodeAt(i) - 33;
+        }
+      } catch (e) {
+        console.log('Body was ', this.body);
+        throw e;
+      }
+    });
+    debugActual('checkerboard.png');
+    loadExpected('checkerboard.png');
 
+    it('gives an encoded string which corresponds to pixel values', function () {
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
 });
