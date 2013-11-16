@@ -75,15 +75,16 @@ describe('phantomjs-pixel-server', function () {
         png.on('end', done);
       });
     }
-
-    it('returns an array of pixel values', function (done) {
+    before(function (done) {
       var that = this;
       getPixels(__dirname + '/expected-files/checkerboard.png', function (err, expectedPixels) {
-        if (err) {
-          return done(err);
-        }
-        assert.deepEqual(that.actualPixels, [].slice.call(expectedPixels.data));
+        that.expectedPixels = expectedPixels;
+        done(err);
       });
+    });
+
+    it('returns an array of pixel values', function () {
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
 
