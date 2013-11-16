@@ -22,6 +22,7 @@ describe('phantomjs-pixel-server', function () {
       var params = {
         width: 10,
         height: 10,
+        // TODO: Move to function over vanilla JS so the callback makes sense
         js: [
           // Draw a white on black checkerboard
           'context.fillStyle = "#000000";',
