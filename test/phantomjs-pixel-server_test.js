@@ -70,6 +70,7 @@ describe('phantomjs-pixel-server', function () {
       width: 10,
       height: 10,
       // TODO: Move to function over vanilla JS so the callback makes sense
+      // This seems promising https://github.com/gyuwon/function-signature
       js: [
         // Draw a white on black checkerboard
         'context.fillStyle = "#000000";',
