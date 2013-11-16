@@ -99,8 +99,7 @@ describe('phantomjs-pixel-server', function () {
   describe('given commands which encrypt as a string', function () {
     // DEV: These were optimal for gifsockets but proved troublesome on Windows with stdout
     // TODO: Look into if Windows + stdout gives us the same trouble
-    // TODO: Will the output have to be offset since we are over HTTP?
-        makeRequest({
+    makeRequest({
       width: 10,
       height: 10,
       // TODO: Move to function over vanilla JS so the callback makes sense
@@ -123,7 +122,7 @@ describe('phantomjs-pixel-server', function () {
         var pixels = new Array(len);
         this.actualPixels = pixels;
         for (; i < len; i++) {
-          pixels[i] = body.charCodeAt(i) - 33;
+          pixels[i] = body.charCodeAt(i);
         }
       } catch (e) {
         console.log('Body was ', this.body);
