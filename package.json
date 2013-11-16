@@ -29,18 +29,17 @@
     "phantomjs-pixel-server": "bin/phantomjs-pixel-server"
   },
   "scripts": {
+    "build-commander": "mkdir -p lib/vendor && browserify --standalone commander --entry node_modules/commander/index.js --transform phantomjsify --external system --outfile lib/vendor/commander.js",
     "test": "mocha"
   },
-  "dependencies": {
-    "browserify": "~2.35.2",
-    "optimist": "~0.6.0",
-    "commander": "~2.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "mocha": "~1.11.0",
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.0",
-    "grunt-contrib-watch": "~0.4.0"
+    "grunt-contrib-watch": "~0.4.0",
+    "browserify": "~2.35.2",
+    "commander": "~2.0.0"
   },
   "keywords": [
     "phantomjs",
