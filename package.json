@@ -27,7 +27,7 @@
   "main": "lib/phantomjs-pixel-server",
   "scripts": {
     "build-commander": "mkdir -p lib/vendor && browserify --standalone commander --entry node_modules/commander/index.js --transform phantomjsify --external system --outfile lib/vendor/commander.js",
-    "test": "mocha"
+    "test": "(pkill phantomjs || true) && mocha"
   },
   "engines": {
     "node": ">= 0.8.0"

@@ -1,8 +1,13 @@
 var spawn = require('child_process').spawn;
+var request = require('request');
 
 describe('phantomjs-pixel-server', function () {
-  before(function () {
+  before(function (done) {
     this.child = spawn(__dirname + '/../bin/phantomjs-pixel-server', [], {stdio: [0, 1, 2]});
+    setTimeout(function () {
+      // TODO: We could wait for 200 from server
+      done();
+    }, 1000);
   });
   after(function (done) {
     this.child.kill();
@@ -49,7 +54,7 @@ describe('phantomjs-pixel-server', function () {
     });
 
     it('returns an array of pixel values', function () {
-      console.log(this.body);
+      console.log(this.body.length);
     });
   });
 });
