@@ -82,7 +82,7 @@ describe('phantomjs-pixel-server', function () {
         if (err) {
           return done(err);
         }
-        assert.deepEqual(that.actualPixels, expectedPixels.data);
+        assert.deepEqual(that.actualPixels, [].slice.call(expectedPixels.data));
       });
     });
   });
