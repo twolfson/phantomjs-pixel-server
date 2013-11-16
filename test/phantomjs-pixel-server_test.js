@@ -58,4 +58,13 @@ describe('phantomjs-pixel-server', function () {
       console.log(this.body.length);
     });
   });
+
+  describe.skip('given commands which encrypt as a string', function () {
+    // DEV: These were optimal for gifsockets but proved troublesome on Windows with stdout
+    // TODO: Look into if Windows + stdout gives us the same trouble
+    // TODO: Will the output have to be offset since we are over HTTP?
+    it('gives an encoded string which corresponds to pixel values', function () {
+
+    });
+  });
 });
