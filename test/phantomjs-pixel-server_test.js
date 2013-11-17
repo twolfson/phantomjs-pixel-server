@@ -96,6 +96,7 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
+      // TODO: We can deepEquals the getPixels value to expectedPixels without coercion in either case
       assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
@@ -128,6 +129,40 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('gives an encoded string which corresponds to pixel values', function () {
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
+    });
+  });
+
+  describe('running an asynchronous set of commands', function () {
+    function drawCheckerboardAsync(canvas, cb) {
+      setTimeout(function () {
+        var context = canvas.getContext('2d');
+        context.fillStyle = "#000000";
+        context.fillRect(0, 0, 10, 10);
+        context.fillStyle = "#FFFFFF";
+        context.fillRect(0, 0, 5, 5);
+        context.fillRect(5, 5, 5, 5);
+        cb();
+      }, 1000);
+    }
+
+    makeRequest({
+      width: 10,
+      height: 10,
+      js: functionToString(drawCheckerboardAsync)
+    });
+    before(function () {
+      try {
+        this.actualPixels = JSON.parse(this.body);
+      } catch (e) {
+        console.log('Body was ', this.body);
+        throw e;
+      }
+    });
+    debugActual('checkerboard.png');
+    loadExpected('checkerboard.png');
+
+    it('returns an array of pixel values', function () {
       assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
