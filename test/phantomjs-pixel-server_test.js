@@ -20,7 +20,6 @@ function makeRequest(params) {
       method: 'POST',
       headers: {
         // DEV: PhantomJS looks for Proper-Case headers, request is lower-case =(
-        // TODO: Note this in the README
         'Content-Length': encodedArg.length
       },
       body: encodedArg,

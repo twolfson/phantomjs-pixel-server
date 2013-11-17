@@ -13,6 +13,13 @@ phantomjs_pixel_server.awesome(); // "awesome"
 ## Documentation
 _(Coming soon)_
 
+```
+headers: {
+  // DEV: PhantomJS looks for Proper-Case headers, request is lower-case =(
+  'Content-Length': encodedArg.length
+},
+```
+
 ## Examples
 _(Coming soon)_
 
