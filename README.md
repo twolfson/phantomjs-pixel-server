@@ -59,6 +59,7 @@ request({
 ```
 
 ## Documentation
+### CLI
 The CLI command for `phantomjs-pixel-server` is a `node` wrapper which invokes a [PhantomJS][] script. The script path is resolved by `node's` `require` function.
 
 ```js
@@ -68,6 +69,8 @@ require.resolve('phantomjs-pixel-server');
 ```
 
 Inside the server, we use [commander][] to accept different parameters for the server. Currently, we only support `port`.
+
+[commander]: https://github.com/visionmedia/commander.js
 
 ```bash
 $ phantomjs-pixel-server --help
@@ -80,6 +83,40 @@ $ phantomjs-pixel-server --help
     -V, --version      output the version number
     -p, --port <port>  Port to run the server on
 ```
+
+### HTTP interface
+`phantomjs-pixel-server` will reply with `200s` to any non-`POST` request (e.g. `GET`). This is a nice way to know when the server has started.
+
+```bash
+curl http://127.0.0.1:9090/
+# IT'S ALIVE!
+```
+
+For `POST` requests, we expect a JSON body that has been run through `escapeURIComponent` (see [Getting Started][] for example). The request can have the following parameters
+
+[Getting Started]: #getting-started
+
+- width `Number` - Width of canvas and output image
+- height `Number` - Height of canvas and output image
+- js `Object` - Container for commands to run against a `canvas` instance
+    - This can be prepared by passing a function to [function-to-string][]
+    - The function itself should have a signature of `function (canvas, cb) {}`
+    - params `String[]` - Array of parameter names for a function
+      - The first parameter will be a `canvas` instance with the provided `width` and `height`
+    - body `String` - Body of the function to execute
+      - This must callback when it is completed (second parameter)
+      - It is expected that `js.body` will write out the content you want to the canvas
+- responseType `String` - Optional flag to set response type.
+    - By default, the response will be an `rgba` array of pixels.
+        - For example, `[0, 1, 2, 3, 4, 5, 6, 7]` is 2 pixels with `r: 0, g: 1, b: 2, a: 3` and `r: 4, g: 5, b: 6, a: 7`
+    - If `responseType` is `'string'`, the response will be a string where each character represents a pixel value
+        - For example, `abcd` is `[97, 98, 99, 100]`
+        - These values can be extracted via [charCodeAt][]. [Another example is in the tests][].
+        - This is practical for reducing padding and using a more efficient parsing technique.
+
+[function-to-string]: https://github.com/twolfson/function-to-string
+[charCodeAt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
+[Another example is in the tests]: https://github.com/twolfson/phantomjs-pixel-server/blob/12d06b5f7c90fa4848dbe4c749180d6b0d726854/test/phantomjs-pixel-server_test.js#L117-L123
 
 ## Donating
 Support this project and [others by twolfson][gittip] via [gittip][].
