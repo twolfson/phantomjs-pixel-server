@@ -1,9 +1,28 @@
 # phantomjs-pixel-server [![Build status](https://travis-ci.org/twolfson/phantomjs-pixel-server.png?branch=master)](https://travis-ci.org/twolfson/phantomjs-pixel-server)
 
-PhantomJS server that converts canvas actions into pixels
+[PhantomJS][] server that converts canvas actions into pixels
+
+This is part of the [gifsockets][] project.
+
+[PhantomJS]: http://phantomjs.org/
+[gifsockets]: https://github.com/twolfson/gifsockets-server
 
 ## Getting Started
-Install the module with: `npm install phantomjs-pixel-server`
+Install the module with: `npm install -g phantomjs-pixel-server`
+
+Start a server and get some pixels:
+
+```bash
+bin/phantomjs-pixel-server &
+# PhantomJS server is running at http://127.0.0.1:9090/
+curl http://127.0.0.1:9090/ -X POST --data \
+'{"width":10,"height":10,"js":{"params":["canvas","cb"], '\
+'"body":"var context = canvas.getContext(\"2d\"); '\
+'context.fillStyle = \"#BADA55\"; context.fillRect(0, 0, 10, 10); cb();"}}'
+# [186,218,85,255,186,218, ..., 255]
+```
+
+// TODO: Document what that looks like with `request`
 
 ```javascript
 var phantomjs_pixel_server = require('phantomjs-pixel-server');
