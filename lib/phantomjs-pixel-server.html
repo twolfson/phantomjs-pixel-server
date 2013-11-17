@@ -6,49 +6,47 @@
   <body>
     <canvas id="canvas"></canvas>
     <script>
-      // Grab the canvas and its context
-      // TODO: This should become a function which is run by evaluate with a callback argument
-      var canvas = document.getElementById('canvas'),
-          context = canvas.getContext('2d');
+      function processCommand(encodedArg) {
+        // Grab the canvas and its context
+        var canvas = document.getElementById('canvas'),
+            context = canvas.getContext('2d');
 
-      // Grab the arguments
-      // TODO: We REALLY should not be using cookies for this x_x
-      // TODO: Maybe we can evaluate JS pre-emptively and save to local storage or something?
-      // TODO: or suck it up and deal with async
-      var encodedArg = document.cookie.replace('PARAMS=', ''),
-          arg = decodeURIComponent(encodedArg),
-          params = JSON.parse(arg);
+        // Grab the arguments
+        // TODO: Do we need to encode/decode at this level?
+        var arg = decodeURIComponent(encodedArg),
+            params = JSON.parse(arg);
 
-      // Set the canvas dimensions
-      canvas.width = params.width;
-      canvas.height = params.height;
+        // Set the canvas dimensions
+        canvas.width = params.width;
+        canvas.height = params.height;
 
-      // TODO: This should be compiled by browserify or the canvas interface with a `loadImage` method
-      var js = params.js;
-      var fn = Function.apply({}, js.params.concat([js.body]));
+        // TODO: This should be compiled by browserify or the canvas interface with a `loadImage` method
+        var js = params.js;
+        var fn = Function.apply({}, js.params.concat([js.body]));
 
-      fn(canvas, function (err) {
-        if (err) {
-          throw err;
-        }
-
-        // Capture the data url and save it for later
-        var data = context.getImageData(0, 0, params.width, params.height).data;
-
-        // DEV: This is the encrypt as a string case
-        if (params.responseType === 'string') {
-          var i = 0;
-          var len = data.length;
-          var retArr = new Array(len);
-          for (; i < len; i++) {
-            // TODO: If data size is super important, consider doubling up on digits by offsetting by 256 (this does lead into potential issues with orphan end pair)
-            retArr[i] = String.fromCharCode(data[i]);
+        fn(canvas, function (err) {
+          if (err) {
+            throw err;
           }
-          window.retStr = retArr.join('');
-        } else {
-          window.retStr = JSON.stringify([].slice.call(data));
-        }
-      });
+
+          // Capture the data url and save it for later
+          var data = context.getImageData(0, 0, params.width, params.height).data;
+
+          // DEV: This is the encrypt as a string case
+          if (params.responseType === 'string') {
+            var i = 0;
+            var len = data.length;
+            var retArr = new Array(len);
+            for (; i < len; i++) {
+              // TODO: If data size is super important, consider doubling up on digits by offsetting by 256 (this does lead into potential issues with orphan end pair)
+              retArr[i] = String.fromCharCode(data[i]);
+            }
+            window.retStr = retArr.join('');
+          } else {
+            window.retStr = JSON.stringify([].slice.call(data));
+          }
+        });
+      }
     </script>
   </body>
 </html>
