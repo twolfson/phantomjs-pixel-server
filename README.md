@@ -22,11 +22,40 @@ curl http://127.0.0.1:9090/ -X POST --data \
 # [186,218,85,255,186,218, ..., 255]
 ```
 
-// TODO: Document what that looks like with `request`
+With [request][], that would look like:
 
-```javascript
-var phantomjs_pixel_server = require('phantomjs-pixel-server');
-phantomjs_pixel_server.awesome(); // "awesome"
+[request]: https://github.com/mikeal/request
+
+```js
+// We use JSON as our body and must serialize it in this maner
+var arg = JSON.stringify({
+  width: 10,
+  height: 10,
+  js: {
+    params: ["canvas", "cb"],
+    body: [
+      'var context = canvas.getContext(\'2d\');'
+      'context.fillStyle = \'#BADA55\';',
+      'context.fillRect(0, 0, 10, 10);',
+      'cb();'
+    ].join('')
+  }
+});
+var encodedArg = encodeURIComponent(arg);
+
+// Request to our server
+request({
+  url: 'http://localhost:9090/',
+  method: 'POST',
+  headers: {
+    // PhantomJS looks for Proper-Case headers, request is lower-case
+    // This means you *must* supply this header
+    'Content-Length': encodedArg.length
+  },
+  body: encodedArg,
+}, function handlePhantomResponse (err, res, body) {
+  // body is "[186,218,85,255,186,218, ..., 255]"
+});
 ```
 
 ## Documentation
