@@ -95,7 +95,6 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
-      // TODO: We can deepEquals the getPixels value to expectedPixels without coercion in either case
       assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
@@ -114,7 +113,7 @@ describe('phantomjs-pixel-server', function () {
         var body = this.body;
         var i = 0;
         var len = body.length;
-        var pixels = new Array(len);
+        var pixels = new Uint8Array(len);
         this.actualPixels = pixels;
         for (; i < len; i++) {
           pixels[i] = body.charCodeAt(i);
@@ -128,7 +127,7 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('gives an encoded string which corresponds to pixel values', function () {
-      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
+      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
     });
   });
 
