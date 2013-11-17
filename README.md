@@ -59,17 +59,27 @@ request({
 ```
 
 ## Documentation
-_(Coming soon)_
+The CLI command for `phantomjs-pixel-server` is a `node` wrapper which invokes a [PhantomJS][] script. The script path is resolved by `node's` `require` function.
 
-```
-headers: {
-  // DEV: PhantomJS looks for Proper-Case headers, request is lower-case =(
-  'Content-Length': encodedArg.length
-},
+```js
+// Resolve locally installed server path
+// '/home/todd/github/phantomjs-pixel-server/lib/phantomjs-pixel-server.js'
+require.resolve('phantomjs-pixel-server');
 ```
 
-## Examples
-_(Coming soon)_
+Inside the server, we use [commander][] to accept different parameters for the server. Currently, we only support `port`.
+
+```bash
+$ phantomjs-pixel-server --help
+
+  Usage: phantomjs-pixel-server.js [options]
+
+  Options:
+
+    -h, --help         output usage information
+    -V, --version      output the version number
+    -p, --port <port>  Port to run the server on
+```
 
 ## Donating
 Support this project and [others by twolfson][gittip] via [gittip][].
