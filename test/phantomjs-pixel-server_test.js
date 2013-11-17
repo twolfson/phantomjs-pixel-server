@@ -33,7 +33,7 @@ function makeRequest(params) {
 function interpretPixels() {
   before(function () {
     try {
-      this.actualPixels = new Uint8Array(JSON.parse(this.body));
+      this.actualPixels = JSON.parse(this.body);
     } catch (e) {
       console.log('Body was ', this.body);
       throw e;
@@ -98,7 +98,7 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
-      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
 
@@ -116,7 +116,7 @@ describe('phantomjs-pixel-server', function () {
         var body = this.body;
         var i = 0;
         var len = body.length;
-        var pixels = new Uint8Array(len);
+        var pixels = new Array(len);
         this.actualPixels = pixels;
         for (; i < len; i++) {
           pixels[i] = body.charCodeAt(i);
@@ -130,7 +130,7 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('gives an encoded string which corresponds to pixel values', function () {
-      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
 
@@ -157,7 +157,7 @@ describe('phantomjs-pixel-server', function () {
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
-      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
+      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
     });
   });
 });
