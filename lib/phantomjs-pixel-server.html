@@ -6,15 +6,10 @@
   <body>
     <canvas id="canvas"></canvas>
     <script>
-      function processCommand(encodedArg) {
+      function processCommand(params) {
         // Grab the canvas and its context
         var canvas = document.getElementById('canvas'),
             context = canvas.getContext('2d');
-
-        // Grab the arguments
-        // TODO: Do we need to encode/decode at this level?
-        var arg = decodeURIComponent(encodedArg),
-            params = JSON.parse(arg);
 
         // Set the canvas dimensions
         canvas.width = params.width;
