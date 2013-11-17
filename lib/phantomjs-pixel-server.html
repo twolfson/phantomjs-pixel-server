@@ -25,9 +25,10 @@
       canvas.height = params.height;
 
       // TODO: This should be compiled by browserify or the canvas interface with a `loadImage` method
-      var fn = new Function('cb', params.js);
+      var js = params.js;
+      var fn = Function.apply({}, js.params.concat([js.body]));
 
-      fn(function (err) {
+      fn(canvas, function (err) {
         if (err) {
           throw err;
         }

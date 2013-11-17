@@ -1,6 +1,7 @@
 var assert = require('assert');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
+var functionToString = require('function-to-string');
 var getPixels = require('get-pixels');
 var ndarray = require('ndarray');
 var request = require('request');
@@ -50,6 +51,18 @@ function loadExpected(filename) {
   });
 }
 
+function drawCheckerboard(canvas, cb) {
+  // Draw a white on black checkerboard
+  var context = canvas.getContext('2d');
+  context.fillStyle = "#000000";
+  context.fillRect(0, 0, 10, 10);
+  context.fillStyle = "#FFFFFF";
+  context.fillRect(0, 0, 5, 5);
+  context.fillRect(5, 5, 5, 5);
+  cb();
+}
+var drawCheckerboardInfo = functionToString(drawCheckerboard);
+
 describe('phantomjs-pixel-server', function () {
   before(function (done) {
     this.child = spawn('phantomjs', [__dirname + '/../lib/phantomjs-pixel-server.js'], {stdio: [0, 1, 2]});
@@ -69,17 +82,7 @@ describe('phantomjs-pixel-server', function () {
     makeRequest({
       width: 10,
       height: 10,
-      // TODO: Move to function over vanilla JS so the callback makes sense
-      // This seems promising https://github.com/gyuwon/function-signature
-      js: [
-        // Draw a white on black checkerboard
-        'context.fillStyle = "#000000";',
-        'context.fillRect(0, 0, 10, 10);',
-        'context.fillStyle = "#FFFFFF";',
-        'context.fillRect(0, 0, 5, 5);',
-        'context.fillRect(5, 5, 5, 5);',
-        'cb();'
-      ].join('\n')
+      js: drawCheckerboardInfo
     });
     before(function () {
       try {
@@ -103,16 +106,7 @@ describe('phantomjs-pixel-server', function () {
     makeRequest({
       width: 10,
       height: 10,
-      // TODO: Move to function over vanilla JS so the callback makes sense
-      js: [
-        // Draw a white on black checkerboard
-        'context.fillStyle = "#000000";',
-        'context.fillRect(0, 0, 10, 10);',
-        'context.fillStyle = "#FFFFFF";',
-        'context.fillRect(0, 0, 5, 5);',
-        'context.fillRect(5, 5, 5, 5);',
-        'cb();'
-      ].join('\n'),
+      js: drawCheckerboardInfo,
       responseType: 'string'
     });
     before(function () {
