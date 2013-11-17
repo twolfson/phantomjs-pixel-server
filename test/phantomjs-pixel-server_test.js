@@ -30,6 +30,16 @@ function makeRequest(params) {
     });
   });
 }
+function interpretPixels() {
+  before(function () {
+    try {
+      this.actualPixels = new Uint8Array(JSON.parse(this.body));
+    } catch (e) {
+      console.log('Body was ', this.body);
+      throw e;
+    }
+  });
+}
 function debugActual(filename) {
   if (process.env.DEBUG_TEST) {
     before(function (done) {
@@ -83,19 +93,12 @@ describe('phantomjs-pixel-server', function () {
       height: 10,
       js: drawCheckerboardInfo
     });
-    before(function () {
-      try {
-        this.actualPixels = JSON.parse(this.body);
-      } catch (e) {
-        console.log('Body was ', this.body);
-        throw e;
-      }
-    });
+    interpretPixels();
     debugActual('checkerboard.png');
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
-      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
+      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
     });
   });
 
@@ -149,19 +152,12 @@ describe('phantomjs-pixel-server', function () {
       height: 10,
       js: functionToString(drawCheckerboardAsync)
     });
-    before(function () {
-      try {
-        this.actualPixels = JSON.parse(this.body);
-      } catch (e) {
-        console.log('Body was ', this.body);
-        throw e;
-      }
-    });
+    interpretPixels();
     debugActual('checkerboard.png');
     loadExpected('checkerboard.png');
 
     it('returns an array of pixel values', function () {
-      assert.deepEqual(this.actualPixels, [].slice.call(this.expectedPixels.data));
+      assert.deepEqual(this.actualPixels, this.expectedPixels.data);
     });
   });
 });
